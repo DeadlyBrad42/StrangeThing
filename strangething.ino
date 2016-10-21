@@ -34,7 +34,7 @@
 int phraseCount = 23;
 String phrases[] = {
   "run",
-  "hide"
+  "hide",
   "murder",
   "redrum",
   "help",
@@ -42,7 +42,7 @@ String phrases[] = {
   "help me",
   "trapped"
   "it escaped",
-  "its  here",
+  "its here",
   "did you hear that",
   "i see you",
   "hi",
@@ -50,8 +50,11 @@ String phrases[] = {
   "get drunk",
   "fuck trump",
   "fyeah",
+  "godamnit jason",
   "boo",
-  "then who was phone",
+  "hail satan",
+  "halloweiners",
+  "who was phone",
   "boo",
   "spoopy",
   "skinwalkers",
