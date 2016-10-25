@@ -36,7 +36,7 @@ String phrases[] = {
 };
 
 // Light Strip
-#define pixelsInStrip 50   // number of neopixels
+#define pixelsInStrip 50 // number of neopixels
 #define controlPin 3 // signal control pin 
 Adafruit_NeoPixel lightstrip = Adafruit_NeoPixel(pixelsInStrip, controlPin, NEO_GRB + NEO_KHZ800);
 
@@ -92,27 +92,91 @@ void setup() {
   // open the serial port at 9600 bps
   Serial.begin(9600);
 
-  // seed rng with noise from pin 0
+  // seed RNG with noise from pin 0
   randomSeed(analogRead(0));
   
   // init lightstrip
   lightstrip.begin();
   lightstrip.show(); // Initialize all pixels to 'off'
+  lightstrip.setBrightness(180); // Set max brightness
 
-  // call debug function
-  //test_default();
-  test_flashRed();
+  // call startup test function
+  test_default();
 }
 
-void loop() {  
-  // pick a random phrase
-  int currentPhrase = random(0, phraseCount);
+void loop() {
+  // Random pick an effect to display
   
+  uint32_t color;
+  switch (13/*random(0, 15)*/) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7: 
+    case 8:
+    case 9:
+    case 10:
+      // Spell a word
+      fx_LightPhrase(phrases[random(0, phraseCount)]);
+      break;
+    case 11:
+      // Flash red
+      fx_FlashColor(lightstrip.Color(255, 0, 00));
+      softDarkenStrip(color);
+      break;
+    case 12:
+      // Flash a random color
+      color = colors[random(0, colorCount)];
+      fx_FlashColor(color);
+      softDarkenStrip(color);
+      break;
+    case 13:
+      // Color line-walk
+      color = colors[random(0, colorCount)];
+      fx_LineWalk(color);
+      softDarkenStrip(color);
+      break;
+    case 14:
+      // Flash rando-color, then pop
+      color = colors[random(0, colorCount)];
+      fx_FlashColor(color);
+      fx_LightPop(lightstrip.Color(255, 255, 255));
+      break;
+      
+    //TODO: line-walk rando color (?)
+    //TODO: 
+  }
+
+  // Wait between effects
+  delayForRandom(7500, 2500);
+}
+
+void test_default() {
+  delay(1000);
+
+  Serial.println("Starting LED test...");
+  fx_LineWalk(lightstrip.Color(255, 255, 255));
+  softDarkenStrip(lightstrip.Color(255, 255, 255));
+  Serial.println("Finished LED test!");
+  
+  fx_LightPhrase("wtf");
+  delay(750);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+//// Effects ///////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+void fx_LightPhrase(String phrase) {  
   // foreach letter in phrase
-  for (int currentLetter = 0; currentLetter < phrases[currentPhrase].length(); currentLetter++) {
-    char letter = phrases[currentPhrase].charAt(currentLetter);
+  for (int currentLetter = 0; currentLetter < phrase.length(); currentLetter++) {
+    char letter = phrase.charAt(currentLetter);
     int ledNumber = letterToLed(letter);
-    uint32_t color = colors[ledNumber % colorCount];
+    uint32_t color = colors[random(0, colorCount) % colorCount]; // was: colors[ledNumber%colorCount]
     
     _debug_color(ledNumber % colorCount);
     _debug_letter(letter);
@@ -133,48 +197,42 @@ void loop() {
 
   // wait between words
   _debug_letter('-');
-  delayForRandom(7500, 2500);
 }
 
-void test_default() {
-  delay(1000);
-
-  Serial.println("Starting LED test...");
-  for (int currentLight = 0; currentLight < pixelsInStrip; currentLight++) {
-      uint32_t color = colors[currentLight % colorCount];
-      _debug_color(currentLight % colorCount);
-      softLightLed(currentLight, color);
-      delay(150);
-      softDarkenLed(currentLight, color);
-      delay(50);
-  }
-  Serial.println("Finished LED test!");
-}
-
-void test_flashRed() {
-  delay(1000);
-  Serial.println("Starting LED flash test...");
-  
-  uint32_t toColor = lightstrip.Color(255, 0, 0);
+void fx_FlashColor(uint32_t color) {
+  delay(1500);
   
   for (int currentStep = 0; currentStep < softStepAmount; currentStep++) {  
-    Serial.print("=== STEP #"); Serial.println(currentStep + 1);
     for (int currentLight = 0; currentLight < pixelsInStrip; currentLight++) {
+      int r = color_clampVal(currentStep * (color_GetRVal(color) / softStepAmount));
+      int g = color_clampVal(currentStep * (color_GetGVal(color) / softStepAmount));
+      int b = color_clampVal(currentStep * (color_GetBVal(color) / softStepAmount));
+      
       lightstrip.setPixelColor(
         currentLight,
-        color_clampVal(currentStep * (color_GetGVal(toColor) / softStepAmount)),
-        color_clampVal(currentStep * (color_GetRVal(toColor) / softStepAmount)),
-        color_clampVal(currentStep * (color_GetBVal(toColor) / softStepAmount))
+        g,
+        r,
+        b
       );
     }
     
     lightstrip.show();
-    delay(250);
-
-    clearLightstrip();
+    delay((softStepAmount - currentStep) * 7);
   }
 
-  Serial.println("Finished LED flast test!");
+  delay(500);
+}
+
+void fx_LineWalk(uint32_t color) {
+  for (int currentLed = 0; currentLed < pixelsInStrip; currentLed++) {
+      hardLightLed(currentLed, color);
+      delay(50);
+  }
+  delayForRandom(1000, 250);
+}
+
+void fx_LightPop(uint32_t color) {
+  
 }
 
 
@@ -189,15 +247,17 @@ uint32_t softLightLed(int ledNumber, uint32_t toColor) {
     int b = color_clampVal(currentStep * (color_GetBVal(toColor) / softStepAmount));
     
     lightstrip.setPixelColor(ledNumber,
-      (g < 5 ? 0 : g), // turn off early
-      (r < 5 ? 0 : r),
-      (b < 5 ? 0 : b)
+      (g < 10 ? 0 : g), // turn off early
+      (r < 10 ? 0 : r),
+      (b < 10 ? 0 : b)
     );
     lightstrip.show();
+    
+    //_debug_message(ledNumber, "soft-lit to", r, g, b);
     delay(25);
   }
 
-  lightstrip.setPixelColor(ledNumber, color_GetRVal(toColor), color_GetGVal(toColor), color_GetBVal(toColor));
+  //lightstrip.setPixelColor(ledNumber, color_GetRVal(toColor), color_GetGVal(toColor), color_GetBVal(toColor));
   lightstrip.show();
   
   _debug_message(ledNumber, "soft-lit to", color_GetRVal(toColor), color_GetGVal(toColor), color_GetBVal(toColor));
@@ -205,7 +265,7 @@ uint32_t softLightLed(int ledNumber, uint32_t toColor) {
 }
 
 uint32_t hardLightLed(int ledNumber, uint32_t toColor) {
-  lightstrip.setPixelColor(ledNumber, color_GetRVal(toColor), color_GetGVal(toColor), color_GetBVal(toColor));
+  lightstrip.setPixelColor(ledNumber, color_GetGVal(toColor), color_GetRVal(toColor), color_GetBVal(toColor));
     lightstrip.show();
     
     //_debug_message(ledNumber, "hard-lit to",color_GetRVal(toColor), color_GetGVal(toColor), color_GetBVal(toColor));
@@ -213,20 +273,19 @@ uint32_t hardLightLed(int ledNumber, uint32_t toColor) {
 }
 
 uint32_t softDarkenLed(int ledNumber, uint32_t fromColor) {  
-  for (int currentStep = 0; currentStep < softStepAmount; currentStep++) {
-  
-    int r = color_clampVal(color_GetGVal(fromColor) - currentStep * (color_GetRVal(fromColor) / softStepAmount));
-    int g = color_clampVal(color_GetRVal(fromColor) - currentStep * (color_GetGVal(fromColor) / softStepAmount));
+  for (int currentStep = 0; currentStep < softStepAmount; currentStep++) {  
+    int r = color_clampVal(color_GetRVal(fromColor) - currentStep * (color_GetRVal(fromColor) / softStepAmount));
+    int g = color_clampVal(color_GetGVal(fromColor) - currentStep * (color_GetGVal(fromColor) / softStepAmount));
     int b = color_clampVal(color_GetBVal(fromColor) - currentStep * (color_GetBVal(fromColor) / softStepAmount));
     lightstrip.setPixelColor(
       ledNumber,
-      (g < 30 ? 0 : g), // turn off early
-      (r < 30 ? 0 : r),
-      (b < 30 ? 0 : b)
+      (g < 10 ? 0 : g), // turn off early
+      (r < 10 ? 0 : r),
+      (b < 10 ? 0 : b)
     );
 
     lightstrip.show();
-    delay(10); // Arbitrary wait-a-bit, dimming seems "faster" than lighting
+    delay(25); // Arbitrary wait-a-bit, dimming seems "faster" than lighting
   }
 
   lightstrip.setPixelColor(ledNumber, 0, 0, 0);
@@ -244,15 +303,40 @@ uint32_t hardDarkenLed(int ledNumber) {
   return lightstrip.Color(0, 0, 0);
 }
 
-int delayForRandom(int median, int spread) {
-  delay(random(median - spread > 0 ? median - spread : 0, median + spread));
+uint32_t softDarkenStrip(uint32_t fromColor) {
+  for (int currentStep = 0; currentStep < softStepAmount; currentStep++) {
+    for (int currentLight = 0; currentLight < pixelsInStrip; currentLight++) {
+      int r = color_clampVal(color_GetRVal(fromColor) - currentStep * (color_GetRVal(fromColor) / softStepAmount));
+      int g = color_clampVal(color_GetGVal(fromColor) - currentStep * (color_GetGVal(fromColor) / softStepAmount));
+      int b = color_clampVal(color_GetBVal(fromColor) - currentStep * (color_GetBVal(fromColor) / softStepAmount));
+      lightstrip.setPixelColor(
+        currentLight,
+        (g < 30 ? 0 : g), // turn off early
+        (r < 30 ? 0 : r),
+        (b < 30 ? 0 : b)
+      );
+    }
+    
+    lightstrip.show();
+    delay(25); // Arbitrary wait-a-bit, dimming seems "faster" than lighting
+  }
+  
+  //_debug_message(-1, "strip soft-dimmed to", 0, 0, 0);
+  return lightstrip.Color(0, 0, 0);
 }
 
-void clearLightstrip() {
+uint32_t hardDarkenStrip() {
   for (int currentLight = 0; currentLight < pixelsInStrip; currentLight++) {  
       lightstrip.setPixelColor(currentLight, 0, 0, 0);
     }
   lightstrip.show();
+  
+  //_debug_message(-1, "strip hard-dimmed to", 0, 0, 0);
+  return lightstrip.Color(0, 0, 0);
+}
+
+int delayForRandom(int median, int spread) {
+  delay(random(median - spread > 0 ? median - spread : 0, median + spread));
 }
 
 int color_GetRVal(uint32_t color) {
