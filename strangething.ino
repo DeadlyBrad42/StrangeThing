@@ -193,7 +193,7 @@ void effects_shuffle() {
 }
 
 void effects_curated() {
-  int spellCount = 0 + random(0, 4);
+  int spellCount = 10 + random(0, 4);
   for (int count = 0; count < spellCount; count++) {
     // Spell a word
     fx_LightPhrase(phrases[random(0, phraseCount)]);
