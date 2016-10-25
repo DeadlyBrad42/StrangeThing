@@ -4,6 +4,7 @@
 //// Configuration /////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 // Phrases
+// (?) Phrases to be displayed
 int phraseCount = 27;
 String phrases[] = {
   "run",
@@ -36,21 +37,24 @@ String phrases[] = {
 };
 
 // Light Strip
-#define pixelsInStrip 100 // number of neopixels
-#define controlPin 3 // signal control pin
+#define pixelsInStrip 100 // number of neopixels (?) Adjust this
+#define controlPin 3 // signal control pin (?) Adjust this
 Adafruit_NeoPixel lightstrip = Adafruit_NeoPixel(pixelsInStrip, controlPin, NEO_GRB + NEO_KHZ800);
 
-// Colors & Fading
-#define softStepAmount 20 // How many `for` steps it takes to soft-light and soft-dim each LED (% of 255 to dim each `for` step)
-
+// Colors
+// (?) Add new colors here to reference in code, and in the `colorCount` array to appear in the random display
 uint32_t white = lightstrip.Color(255, 255, 255);
 uint32_t blue = lightstrip.Color(0, 0, 255);
 uint32_t pink = lightstrip.Color(255, 0, 255);
 uint32_t green = lightstrip.Color(0, 255, 0);
 uint32_t yellow = lightstrip.Color(255, 255, 0);
 uint32_t red = lightstrip.Color(255, 0, 0);
-uint32_t assignedColor = lightstrip.Color(0, 0, 0, 255); // Each bulb has an "assigned" color, depending on the `colors` list belows
 
+// Marker variable representing times when you want bulbs lit with their
+//  "assigned" color, taken from the `colors` list belows
+uint32_t assignedColor = lightstrip.Color(0, 0, 0, 255);
+
+// (?) Array of colors used for `assignedColor`, as well as the list for random colors
 int colorCount = 6;
 uint32_t colors[] = {
   white,
@@ -61,7 +65,12 @@ uint32_t colors[] = {
   red
 };
 
+// Fading
+#define softStepAmount 20 // How many `for` steps it takes to soft-light and soft-dim each LED
+
 // LED Letters
+// (?) You may need to adjust this for your display
+/////
 #define led_A 0
 #define led_B 2
 #define led_C 4
@@ -71,7 +80,7 @@ uint32_t colors[] = {
 #define led_G 12
 #define led_H 14
 #define led_I 32
-///
+/////
 #define led_J 30
 #define led_K 28
 #define led_L 26
@@ -80,7 +89,7 @@ uint32_t colors[] = {
 #define led_O 20
 #define led_P 18
 #define led_Q 16
-///
+/////
 #define led_R 34
 #define led_S 36
 #define led_T 38
@@ -114,8 +123,6 @@ void setup() {
 }
 
 void loop() {
-  fx_LightPhrase(phrases[random(0, phraseCount)]);
-  
   // CHOOSE MODE:
 
   // Shuffle through various effects
@@ -124,7 +131,12 @@ void loop() {
   // -or-
 
   // "Curated", ordered display
-  //effects_curated();
+  effects_curated();
+
+  // -or
+
+  // Just call functions to do whatever you want
+  //fx_LightPhrase("very spooky");
 }
 
 void effects_shuffle() {
@@ -185,7 +197,7 @@ void effects_curated() {
   for (int count = 0; count < spellCount; count++) {
     // Spell a word
     fx_LightPhrase(phrases[random(0, phraseCount)]);
-    
+
     // Wait a bit
     delayForRandom(7500, 2500);
   }
@@ -240,13 +252,13 @@ void effects_curated() {
   delayForRandom(2 * 6000, 6000);
   fx_Flicker(assignedColor);
   delayForRandom(1 * 6000, 6000);
-  
+
   // Wait a while
   delayForRandom(2 * 6000, 3000);
 
   // Pop to Black
   fx_LightPop(assignedColor);
-  
+
   // Wait a bit
   delayForRandom(7500, 2500);
 }
@@ -318,7 +330,7 @@ void fx_FlashColor(uint32_t color) {
 
 void fx_LineWalk(uint32_t color) {
   for (int currentLed = 0; currentLed < pixelsInStrip; currentLed++) {
-      uint32_t bulbColor = (color == assignedColor ? colors[currentLed % colorCount] : color);  
+      uint32_t bulbColor = (color == assignedColor ? colors[currentLed % colorCount] : color);
       hardLightLed(currentLed, bulbColor);
       delay(50);
   }
@@ -375,7 +387,7 @@ void fx_Flicker(uint32_t color) {
 
 uint32_t softLightLed(int ledNumber, uint32_t toColor) {
   for (int currentStep = 0; currentStep < softStepAmount; currentStep++) {
-    uint32_t bulbColor = (toColor == assignedColor ? colors[ledNumber % colorCount] : toColor);  
+    uint32_t bulbColor = (toColor == assignedColor ? colors[ledNumber % colorCount] : toColor);
     int r = color_clampVal(currentStep * (color_GetRVal(bulbColor) / softStepAmount));
     int g = color_clampVal(currentStep * (color_GetGVal(bulbColor) / softStepAmount));
     int b = color_clampVal(currentStep * (color_GetBVal(bulbColor) / softStepAmount));
@@ -403,8 +415,8 @@ uint32_t softLightLed(int ledNumber, uint32_t toColor) {
 }
 
 uint32_t hardLightLed(int ledNumber, uint32_t toColor) {
-  uint32_t bulbColor = (toColor == assignedColor ? colors[ledNumber % colorCount] : toColor);  
-  
+  uint32_t bulbColor = (toColor == assignedColor ? colors[ledNumber % colorCount] : toColor);
+
   lightstrip.setPixelColor(ledNumber, color_GetGVal(bulbColor), color_GetRVal(bulbColor), color_GetBVal(bulbColor));
   lightstrip.show();
 
@@ -414,7 +426,7 @@ uint32_t hardLightLed(int ledNumber, uint32_t toColor) {
 
 uint32_t softDarkenLed(int ledNumber, uint32_t fromColor) {
   for (int currentStep = 0; currentStep < softStepAmount; currentStep++) {
-    uint32_t bulbColor = (fromColor == assignedColor ? colors[ledNumber % colorCount] : fromColor);  
+    uint32_t bulbColor = (fromColor == assignedColor ? colors[ledNumber % colorCount] : fromColor);
     int r = color_clampVal(color_GetRVal(bulbColor) - currentStep * (color_GetRVal(bulbColor) / softStepAmount));
     int g = color_clampVal(color_GetGVal(bulbColor) - currentStep * (color_GetGVal(bulbColor) / softStepAmount));
     int b = color_clampVal(color_GetBVal(bulbColor) - currentStep * (color_GetBVal(bulbColor) / softStepAmount));
@@ -422,7 +434,7 @@ uint32_t softDarkenLed(int ledNumber, uint32_t fromColor) {
     Serial.print(r); Serial.print(",");
     Serial.print(g); Serial.print(",");
     Serial.println(b);
-    
+
     lightstrip.setPixelColor(
       ledNumber,
       (g < 10 ? 0 : g), // turn off early
@@ -452,7 +464,7 @@ uint32_t hardDarkenLed(int ledNumber) {
 uint32_t softDarkenStrip(uint32_t fromColor) {
   for (int currentStep = 0; currentStep < softStepAmount; currentStep++) {
     for (int currentLed = 0; currentLed < pixelsInStrip; currentLed++) {
-      uint32_t bulbColor = (fromColor == assignedColor ? colors[currentLed % colorCount] : fromColor); 
+      uint32_t bulbColor = (fromColor == assignedColor ? colors[currentLed % colorCount] : fromColor);
       int r = color_clampVal(color_GetRVal(bulbColor) - currentStep * (color_GetRVal(bulbColor) / softStepAmount));
       int g = color_clampVal(color_GetGVal(bulbColor) - currentStep * (color_GetGVal(bulbColor) / softStepAmount));
       int b = color_clampVal(color_GetBVal(bulbColor) - currentStep * (color_GetBVal(bulbColor) / softStepAmount));
