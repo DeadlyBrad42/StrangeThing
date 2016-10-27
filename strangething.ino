@@ -194,21 +194,8 @@ void effects_shuffle() {
 }
 
 void effects_curated() {
-  int spellCount = 10 + random(0, 4);
-  for (int count = 0; count < spellCount; count++) {
-    // Spell a word
-    fx_LightPhrase(phrases[random(0, phraseCount)]);
-
-    // Wait a bit
-    delayForRandom(7500, 2500);
-  }
-
-  // Wait a while
-  delayForRandom(4 * 6000, 3000);
-
   // Play random effect
-  uint32_t color;
-  switch (random(0, 5)) {
+  switch (random(0, 4)) {
     case 0:
       // Red Flash
       fx_FlashColor(red);
@@ -231,37 +218,40 @@ void effects_curated() {
       fx_LineWalk(assignedColor);
       softDarkenStrip(assignedColor);
       break;
-    case 4:
-      // Random-color flash, then pop
-      color = colors[random(0, colorCount)];
-      fx_FlashColor(color);
-      fx_LightPop(white);
-      break;
   }
-
-  // Wait a bit
-  delayForRandom(7500, 2500);
 
   // Fade to assignedColor
   fx_FlashColor(assignedColor);
 
-  // Wait a while
+  // Wait for ~4 minutes
   delayForRandom(4 * 6000, 3000);
 
-  // Pulse
-  fx_Flicker(assignedColor);
-  delayForRandom(2 * 6000, 6000);
-  fx_Flicker(assignedColor);
-  delayForRandom(1 * 6000, 6000);
+  // Flicker for ~30 seconds
+  fx_Flicker(assignedColor, 500);
 
-  // Wait a while
-  delayForRandom(2 * 6000, 3000);
+  // Wait for 10-30 seconds
+  delayForRandom(1000 + 2000, 1000);
+
+  // Flicker for ~2 minutes
+  fx_Flicker(assignedColor, 2000);
+
+  // Wait for 10-30 seconds
+  delayForRandom(1000 + 2000, 1000);
 
   // Pop to Black
   fx_LightPop(assignedColor);
 
-  // Wait a bit
-  delayForRandom(7500, 2500);
+  // blink red 3 times
+  for (int count = 0; count < 3; count++) {
+    fx_FlashColor(red);
+    softDarkenStrip(red);
+  }
+
+  // Light up a phrase
+  fx_LightPhrase(phrases[random(0, phraseCount)]);
+
+  // Wait for ~2 minutes
+  delayForRandom(4 * 6000, 3000);
 }
 
 void test_default() {
@@ -358,8 +348,11 @@ void fx_LightPop(uint32_t color) {
 }
 
 void fx_Flicker(uint32_t color) {
-  int timeLength = 5000 + random(0, 2500); // 5000 = ~2 mins
-  for (int timer = 0; timer < timeLength; timer++) {
+    // Flicker for default amount of cycles. I've found that 5000 = ~2mins
+    void fx_Flicker(uint32_t color, 5000);
+}
+void fx_Flicker(uint32_t color, int cycles) {
+  for (int timer = 0; timer < cycles; timer++) {
     for (int currentLed = 0; currentLed < pixelsInStrip; currentLed++) {
       // Get bulb color
       uint32_t bulbColor = (color == assignedColor ? colors[currentLed % colorCount] : color);
