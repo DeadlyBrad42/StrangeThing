@@ -71,34 +71,34 @@ uint32_t colors[] = {
 // LED Letters
 // (?) You may need to adjust this for your display
 /////
-#define led_A 0
-#define led_B 2
-#define led_C 4
-#define led_D 6
-#define led_E 8
-#define led_F 10
-#define led_G 12
-#define led_H 14
-#define led_I 32
+#define led_A 5
+#define led_B 8
+#define led_C 13
+#define led_D 17
+#define led_E 21
+#define led_F 24
+#define led_G 27
+#define led_H 30
 /////
-#define led_J 30
-#define led_K 28
-#define led_L 26
-#define led_M 24
-#define led_N 22
-#define led_O 20
-#define led_P 18
-#define led_Q 16
+#define led_I 66
+#define led_J 62
+#define led_K 59
+#define led_L 56
+#define led_M 52
+#define led_N 48
+#define led_O 45
+#define led_P 42
+#define led_Q 38
 /////
-#define led_R 34
-#define led_S 36
-#define led_T 38
-#define led_U 40
-#define led_V 42
-#define led_W 44
-#define led_X 46
-#define led_Y 48
-#define led_Z 49
+#define led_R 74
+#define led_S 77
+#define led_T 81
+#define led_U 85
+#define led_V 88
+#define led_W 91
+#define led_X 95
+#define led_Y 98
+#define led_Z 0
 /////
 
 
@@ -144,6 +144,19 @@ void loop() {
 ////////////////////////////////////////////////////////////////////////////////
 //// Functions /////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+
+void test_default() {
+  delay(1000);
+
+  Serial.println("Starting LED test...");
+  fx_LineWalk(white);
+  softDarkenStrip(white);
+  Serial.println("Finished LED test!");
+
+  // fx_LightPhrase("abcdefghijklmnopqrstuvwxy");
+  fx_LightPhrase("wtf");
+  delay(750);
+}
 
 void effects_shuffle() {
   // Randomly pick an effect|text to display
@@ -199,6 +212,8 @@ void effects_shuffle() {
 }
 
 void effects_curated() {
+  uint32_t color;
+
   // Play random effect
   switch (random(0, 4)) {
     case 0:
@@ -228,8 +243,8 @@ void effects_curated() {
   // Fade to assignedColor
   fx_FlashColor(assignedColor);
 
-  // Wait for ~4 minutes
-  delayForRandom(4 * 6000, 3000);
+  // Wait for ~3 minutes
+  delayForRandom(3 * 6000, 3000);
 
   // Flicker for ~30 seconds
   fx_Flicker(assignedColor, 500);
@@ -239,9 +254,6 @@ void effects_curated() {
 
   // Flicker for ~2 minutes
   fx_Flicker(assignedColor, 2000);
-
-  // Wait for 10-30 seconds
-  delayForRandom(1000 + 2000, 1000);
 
   // Pop to Black
   fx_LightPop(assignedColor);
@@ -256,19 +268,7 @@ void effects_curated() {
   fx_LightPhrase(phrases[random(0, phraseCount)]);
 
   // Wait for ~2 minutes
-  delayForRandom(4 * 6000, 3000);
-}
-
-void test_default() {
-  delay(1000);
-
-  Serial.println("Starting LED test...");
-  fx_LineWalk(white);
-  softDarkenStrip(white);
-  Serial.println("Finished LED test!");
-
-  fx_LightPhrase("wtf");
-  delay(750);
+  delayForRandom(2 * 6000, 3000);
 }
 
 
@@ -354,8 +354,9 @@ void fx_LightPop(uint32_t color) {
 
 void fx_Flicker(uint32_t color) {
     // Flicker for default amount of cycles. I've found that 5000 = ~2mins
-    void fx_Flicker(uint32_t color, 5000);
+    fx_Flicker(color, 5000);
 }
+
 void fx_Flicker(uint32_t color, int cycles) {
   for (int timer = 0; timer < cycles; timer++) {
     for (int currentLed = 0; currentLed < pixelsInStrip; currentLed++) {
@@ -419,7 +420,7 @@ uint32_t hardLightLed(int ledNumber, uint32_t toColor) {
   lightstrip.setPixelColor(ledNumber, color_GetGVal(bulbColor), color_GetRVal(bulbColor), color_GetBVal(bulbColor));
   lightstrip.show();
 
-  //_debug_message(ledNumber, "hard-lit to",color_GetRVal(bulbColor), color_GetGVal(bulbColor), color_GetBVal(bulbColor));
+  //_debug_message(ledNumber, "hard-lit to", color_GetRVal(bulbColor), color_GetGVal(bulbColor), color_GetBVal(bulbColor));
   return toColor;
 }
 
