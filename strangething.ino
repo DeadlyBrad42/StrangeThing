@@ -5,28 +5,25 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Phrases
 // (?) Phrases to be displayed
-int phraseCount = 27;
+int phraseCount = 36;
 String phrases[] = {
   "run",
   "hide",
   "murder",
   "redrum",
   "help",
-  "undead",
   "help me",
   "trapped"
   "it escaped",
-  "its here",
-  "did you hear that",
   "i see you",
   "kill",
   "hi",
   "beer me",
+  "booze",
   "get drunk",
   "fuck trump",
   "fyeah",
   "godamnit jason",
-  "boo",
   "hail satan",
   "halloweiners",
   "who was phone",
@@ -34,6 +31,18 @@ String phrases[] = {
   "spoopy",
   "skinwalkers",
   "i want to believe",
+  "covfefe",
+  "eat the rich",
+  "rip nate",
+  "watch the ads",
+  "gregg rulz ok",
+  "sixty nine",
+  "vote",
+  "doot doot",
+  "rip in piece",
+  "puke outside",
+  "blaze it",
+  "im still hungover",
 };
 
 // Light Strip
