@@ -1,0 +1,7 @@
+{
+    "sketch": "src\\strangething\\strangething.ino",
+    "board": "arduino:avr:diecimila",
+    "port": "COM3",
+    "output": "build",
+    "configuration": "cpu=atmega328"
+}
