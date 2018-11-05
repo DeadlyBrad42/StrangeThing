@@ -53,4 +53,4 @@ Feel free to fork this repository and submit PRs for any missing features or eff
 
 ## More Photos
 Here's what it looks like in the dark, right before the Halloween party when you're slightly buzzed but still think you could be steady enough to take a video:
-![](https://raw.githubusercontent.com/DeadlyBrad42/StrangeThing/master/assets/img/lightup01.jpg)
+![](https://raw.githubusercontent.com/DeadlyBrad42/StrangeThing/master/assets/img/lightup01.gif)
