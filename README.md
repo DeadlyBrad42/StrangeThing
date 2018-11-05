@@ -2,21 +2,21 @@
 ### Another Arduino-powered Stranger Things wall
 ---
 
-![Stranger Things light-up wall](https://raw.githubusercontent.com/DeadlyBrad42/StrangeThing/master/img/lightup01.gif)
-
-_sorry for potato-cam_
+![Stranger Things light-up wall, spelling "v original"](https://raw.githubusercontent.com/DeadlyBrad42/StrangeThing/master/assets/img/lightup02.gif)
 
 ## About
 After years of only ever using my Arduino to make an LED blink, me and my roommate Clinton got the bright idea to make use my Arduino-blinking skills to build an awesome decoration for our Halloween party, inspired by similar Stranger Things walls we saw online.
 
 ## The (Physical) Build
-![before adding the light strand](https://raw.githubusercontent.com/DeadlyBrad42/StrangeThing/master/img/build01.jpg)
+![before adding the light strand](https://raw.githubusercontent.com/DeadlyBrad42/StrangeThing/master/assets/img/build01.jpg)
 
 To build the wall's electronics, I used an Arduino Duemilanove, two strands of [WS2811 RGB LEDs](https://www.amazon.com/dp/B00MXW054Y/ref=as_li_ss_tl?_encoding=UTF8&me=&linkCode=ll1&tag=om03-20&linkId=76a7c1abdb34ac500a43f9974eba99ec), a [power supply](https://www.adafruit.com/product/1466), and some other [odds](https://www.adafruit.com/product/368) & [ends](https://www.adafruit.com/product/2880).
 
 The board itself is made of styrofoam with a flowered wallpaper applied to it, and wooden framed edges.
 
 I basically followed [this Adafruit wiring guide](https://learn.adafruit.com/12mm-led-pixels/wiring), although the lightstrand I used doesn't have the addtional data line. I then wired in the power connector ([this page of the same guide](https://learn.adafruit.com/12mm-led-pixels/power))
+
+![Wired in power & data lines using a JST connector](https://raw.githubusercontent.com/DeadlyBrad42/StrangeThing/master/assets/img/wiring01.jpg)
 
 ## The (Software) Build
 Running the code on your own lightstrand is fairly straight-forward. Depending on your needs, you can set up the project using either the **Arduino IDE**, or **Visual Studio Code** with the _Arduino_ extension.
@@ -50,3 +50,7 @@ Feel free to fork this repository and submit PRs for any missing features or eff
 
 ## License
 [lol sure](https://github.com/DeadlyBrad42/StrangeThing/blob/master/LICENSE)
+
+## More Photos
+Here's what it looks like in the dark, right before the Halloween party when you're slightly buzzed but still think you could be steady enough to take a video:
+![](https://raw.githubusercontent.com/DeadlyBrad42/StrangeThing/master/assets/img/lightup01.jpg)
